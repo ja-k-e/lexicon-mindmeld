@@ -1,15 +1,18 @@
-import data from "https://unpkg.com/lexicon-data@1.0.0/index.mjs";
+import data from "https://unpkg.com/lexicon-data@1.0.1/index.mjs";
 import SeededRandomEngine from "https://unpkg.com/seeded-random-engine@1.0.3/index.mjs";
 
 const { constraints, topics } = data;
 
 const $main = document.querySelector("main");
-const $prev = document.getElementById("prev");
-const $next = document.getElementById("next");
+const $lost = document.getElementById("lost");
+const $won = document.getElementById("won");
 const $groupA = document.getElementById("group-a");
 const $groupB = document.getElementById("group-b");
 const $generation = document.getElementById("generation");
+const $constants = document.getElementById("constants");
 const $level = document.getElementById("level");
+const $levelDisplay = document.getElementById("level-display");
+const $seed = document.getElementById("seed");
 
 const stages = generateStages([
   { guesses: 1, start: 3, end: 5 },
@@ -21,66 +24,95 @@ const maxItems = 10;
 const maxGuesses = 3;
 const rangeItems = maxItems * 2;
 const cores = rangeItems + maxGuesses;
-let engine = generateEngine();
+const searchParams = new URLSearchParams(window.location.search);
+const seed = searchParams.get("s") || "your-seed-here";
+
+const state = {
+  level: 1,
+  seed,
+  engine: null,
+};
+
+generateEngine();
 
 function generateEngine() {
-  return new SeededRandomEngine({
+  delete state.engine;
+  state.engine = new SeededRandomEngine({
     cores,
-    history: 1,
-    seed: "here",
+    history: 10,
+    seed: state.seed,
   });
 }
 
-const config = {
-  level: 1,
-};
-
-$groupA.addEventListener("change", groupChange);
-$groupB.addEventListener("change", groupChange);
-$level.addEventListener("change", () => {
+$seed.value = state.seed;
+$groupA.addEventListener("click", () => groupChange("a"));
+$groupB.addEventListener("click", () => groupChange("b"));
+$levelDisplay.addEventListener("click", () =>
+  $constants.classList.remove("hide")
+);
+$constants.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!state.side) {
+    return;
+  }
   const level = parseInt($level.value);
-  if (!$level.value) {
-    return;
-  }
-  generate(level);
-});
-$generation.addEventListener("change", () => {
   const generation = parseInt($generation.value);
-  if (!$generation.value) {
-    return;
+  if ($seed.value !== state.seed || generation < state.engine.generation) {
+    state.seed = $seed.value;
+    searchParams.set("s", state.seed);
+    const { protocol, host, pathname } = window.location;
+    const path = [
+      protocol,
+      "//",
+      host,
+      pathname,
+      "?",
+      searchParams.toString(),
+    ].join("");
+    window.history.replaceState({ path }, "", path);
+    generateEngine();
   }
-  if (generation < engine.generation) {
-    engine = generateEngine();
-  } else {
-    engine.ff(generation - 1);
+
+  if (generation > state.engine.generation) {
+    state.engine.ff(generation);
   }
-  generate();
+
+  updateLevel(level);
+
+  $constants.classList.add("hide");
 });
 
-$prev.addEventListener("click", () => generate(config.level - 1));
-$next.addEventListener("click", () => generate(config.level + 1));
-generate(1);
+$lost.addEventListener("click", () => generateAndUpdateLevel(state.level - 1));
+$won.addEventListener("click", () => generateAndUpdateLevel(state.level + 1));
 
-function groupChange() {
-  if ($groupA.checked) {
+function groupChange(aOrB) {
+  state.side = aOrB;
+  if (aOrB === "a") {
+    $groupA.classList.remove("unselected");
+    $groupB.classList.add("unselected");
     document.body.classList.add("group-a");
     document.body.classList.remove("group-b");
-  }
-  if ($groupB.checked) {
+  } else if (aOrB === "b") {
+    $groupA.classList.add("unselected");
+    $groupB.classList.remove("unselected");
     document.body.classList.add("group-b");
     document.body.classList.remove("group-a");
   }
 }
 
-function generate(nextLevel) {
-  engine.generate();
-  $generation.value = engine.generation;
+function generateAndUpdateLevel(level) {
+  state.engine.generate();
+  $generation.value = state.engine.generation;
+  updateLevel(level);
+}
 
-  if (nextLevel !== undefined) {
-    config.level = Math.max(nextLevel, 1);
-    $level.value = config.level;
+function updateLevel(level) {
+  if (level !== state.level) {
+    state.level = Math.max(level, 1);
   }
-  if (config.level % 2 === 0) {
+  $level.value = state.level;
+  $levelDisplay.innerText = `Level ${state.level}`;
+  if (state.level % 2 === 0) {
     document.body.classList.remove("odd");
     document.body.classList.add("even");
   } else {
@@ -92,7 +124,7 @@ function generate(nextLevel) {
   const terms = extractTerms();
 
   const { guesses, quantity } =
-    stages[Math.min(stages.length, config.level) - 1];
+    stages[Math.min(stages.length, state.level) - 1];
 
   const constraintsDisplay = [...constraints].slice(0, guesses);
   const termsDisplay = shuffle([...terms].slice(0, quantity));
@@ -119,7 +151,7 @@ function generate(nextLevel) {
 }
 
 function extractConstraints() {
-  const values = engine.values();
+  const values = state.engine.values();
   const possible = constraints.simple;
   const straints = [];
   for (let i = 0; i < maxGuesses; i++) {
@@ -129,12 +161,15 @@ function extractConstraints() {
 }
 
 function extractTerms() {
-  const values = engine.values();
+  const values = state.engine.values();
   const terms = [];
+  const topicsTmp = [];
+  topics.forEach((group) => topicsTmp.push([...group]));
   for (let i = 0; i < rangeItems; i += 2) {
-    const group = topics[Math.floor(values[i] * topics.length)];
+    const group = topicsTmp[Math.floor(values[i] * topicsTmp.length)];
     const index = Math.floor(values[i + 1] * group.length);
-    terms.push(group.splice(index, 1)[0]);
+    const item = group.splice(index, 1)[0];
+    terms.push(item);
   }
   return terms;
 }

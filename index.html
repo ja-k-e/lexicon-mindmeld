@@ -13,22 +13,39 @@
 
       <aside>
         <div class="group">
-          <button id="prev"><span>◂</span></button>
-          <input id="level" type="number" value="0" min="0" />
-          <button id="next"><span>▸</span></button>
+          <button id="lost">Lost</button>
+          <button id="won">Won</button>
         </div>
-
         <div class="group">
-          <input type="radio" id="group-a" name="group" />
-          <label for="group-a">A</label>
-          <input type="radio" id="group-b" name="group" />
-          <label for="group-b">B</label>
-        </div>
-
-        <div class="group">
-          <input id="generation" type="number" min="0" value="0" />
+          <button id="level-display"></button>
         </div>
       </aside>
+
+      <form id="constants">
+        <div class="group">
+          <button id="group-a" class="unselected" type="button">Group A</button>
+          <button id="group-b" class="unselected" type="button">Group B</button>
+        </div>
+        <div class="group">
+          <label class="text" for="level">
+            <input id="level" type="number" value="1" min="1" required />
+            Level
+          </label>
+          <label class="text" for="generation">
+            <input id="generation" type="number" value="1" min="1" required />
+            Generation
+          </label>
+        </div>
+        <div class="group">
+          <label class="text" for="seed">
+            <input id="seed" type="text" required />
+            Seed
+          </label>
+        </div>
+        <div class="group">
+          <button type="submit">Go</button>
+        </div>
+      </form>
     </section>
 
     <script type="module" src="app.js"></script>

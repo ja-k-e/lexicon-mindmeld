@@ -25,12 +25,27 @@ main {
 }
 
 main,
-aside {
-  padding: 2rem;
+aside,
+#constants {
+  padding: 1rem;
+}
+
+#constants {
+  background: var(--bg);
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+#constants.hide {
+  display: none;
 }
 
 body,
-input {
+input,
+button {
   font-size: 1rem;
 }
 
@@ -59,43 +74,34 @@ body.group-b.odd main .view-1 {
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
-input[type="radio"] {
-  left: -99999px;
-  position: fixed;
-}
-
-input[type="radio"]:checked + label {
-  background: var(--color);
-  color: var(--bg);
-}
-
-button span {
-  font-size: 1.8rem;
-  left: 50%;
-  line-height: 1rem;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
 button,
 label {
   user-select: none;
 }
 
 button,
-input[type="number"],
-label {
+input {
   background: var(--off-bg);
   border: 0;
   border-radius: 0;
   display: block;
+  flex: 1;
   font-weight: bold;
   line-height: 1;
   padding: 0.5rem 1rem;
   position: relative;
   text-align: center;
-  width: 6rem;
+  width: 100%;
+}
+
+label.text {
+  text-align: center;
+  width: 100%;
+}
+
+button:not(.unselected) {
+  background: var(--color);
+  color: var(--bg);
 }
 
 div.group {
@@ -110,7 +116,7 @@ div.group + div.group {
 }
 
 ul {
-  font-size: 1.8rem;
+  font-size: 1.75rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -118,5 +124,10 @@ ul {
 }
 
 li + li {
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+#level-display {
+  background: var(--off-bg);
+  color: var(--color);
 }
