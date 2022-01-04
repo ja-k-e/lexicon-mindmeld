@@ -5,8 +5,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lexicon Mindmeld</title>
+    <link href="app.css" rel="stylesheet" />
   </head>
   <body>
+    <main></main>
+
+    <aside>
+      <div class="group">
+        <button id="prev"><span>◂</span></button>
+        <input id="level" type="number" value="0" min="0" />
+        <button id="next"><span>▸</span></button>
+      </div>
+
+      <div class="group">
+        <input type="radio" id="group-a" name="group" />
+        <label for="group-a">A</label>
+        <input type="radio" id="group-b" name="group" />
+        <label for="group-b">B</label>
+      </div>
+
+      <div class="group">
+        <input id="generation" type="number" min="0" value="0" />
+      </div>
+    </aside>
+
     <script type="module" src="app.js"></script>
   </body>
 </html>
