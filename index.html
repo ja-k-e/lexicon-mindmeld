@@ -23,23 +23,26 @@
 
       <form id="constants">
         <div class="group">
-          <button id="group-a" class="unselected" type="button">Group A</button>
-          <button id="group-b" class="unselected" type="button">Group B</button>
-        </div>
-        <div class="group">
-          <label class="text" for="level">
+          <label style="width: 76%" class="text">
+            <div class="group">
+              <button id="group-a" class="unselected" type="button">A</button>
+              <button id="group-b" class="unselected" type="button">B</button>
+            </div>
+            Group
+          </label>
+          <label style="width: 24%" class="text" for="level">
             <input id="level" type="number" value="1" min="1" required />
             Level
           </label>
-          <label class="text" for="generation">
-            <input id="generation" type="number" value="1" min="1" required />
-            Generation
-          </label>
         </div>
         <div class="group">
-          <label class="text" for="seed">
+          <label style="width: 50%" class="text" for="seed">
             <input id="seed" type="text" required />
             Seed
+          </label>
+          <label style="width: 50%" class="text" for="generation">
+            <input id="generation" type="number" value="1" min="1" required />
+            Cursor #
           </label>
         </div>
         <div class="group">

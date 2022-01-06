@@ -85,7 +85,6 @@ input {
   border: 0;
   border-radius: 0;
   display: block;
-  flex: 1;
   font-weight: bold;
   line-height: 1;
   padding: 0.5rem 1rem;
@@ -94,9 +93,9 @@ input {
   width: 100%;
 }
 
-label.text {
+label {
+  max-width: 100%;
   text-align: center;
-  width: 100%;
 }
 
 button:not(.unselected) {
@@ -112,7 +111,7 @@ div.group > * + * {
   margin-left: 0.5rem;
 }
 div.group + div.group {
-  margin-top: 0.5rem;
+  margin-top: 2rem;
 }
 
 ul {

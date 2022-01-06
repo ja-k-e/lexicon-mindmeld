@@ -1,5 +1,5 @@
 import data from "https://unpkg.com/lexicon-data@1.0.1/index.mjs";
-import SeededRandomEngine from "https://unpkg.com/seeded-random-engine@1.0.3/index.mjs";
+import SeededRandomEngine from "https://unpkg.com/seeded-random-engine@1.0.4/index.mjs";
 
 const { constraints, topics } = data;
 
@@ -35,18 +35,9 @@ const state = {
 
 generateEngine();
 
-function generateEngine() {
-  delete state.engine;
-  state.engine = new SeededRandomEngine({
-    cores,
-    history: 10,
-    seed: state.seed,
-  });
-}
-
 $seed.value = state.seed;
-$groupA.addEventListener("click", () => groupChange("a"));
-$groupB.addEventListener("click", () => groupChange("b"));
+$groupA.addEventListener("click", () => handleGroupChange("a"));
+$groupB.addEventListener("click", () => handleGroupChange("b"));
 $levelDisplay.addEventListener("click", () =>
   $constants.classList.remove("hide")
 );
@@ -57,24 +48,12 @@ $constants.addEventListener("submit", (e) => {
   }
   const level = parseInt($level.value);
   const generation = parseInt($generation.value);
-  if ($seed.value !== state.seed || generation < state.engine.generation) {
-    state.seed = $seed.value;
-    searchParams.set("s", state.seed);
-    const { protocol, host, pathname } = window.location;
-    const path = [
-      protocol,
-      "//",
-      host,
-      pathname,
-      "?",
-      searchParams.toString(),
-    ].join("");
-    window.history.replaceState({ path }, "", path);
-    generateEngine();
+  if ($seed.value !== state.seed) {
+    handleSeedChange($seed.value);
   }
 
-  if (generation > state.engine.generation) {
-    state.engine.ff(generation);
+  if (generation !== state.engine.generation) {
+    state.engine.to(generation);
   }
 
   updateLevel(level);
@@ -85,7 +64,32 @@ $constants.addEventListener("submit", (e) => {
 $lost.addEventListener("click", () => generateAndUpdateLevel(state.level - 1));
 $won.addEventListener("click", () => generateAndUpdateLevel(state.level + 1));
 
-function groupChange(aOrB) {
+function generateEngine() {
+  delete state.engine;
+  state.engine = new SeededRandomEngine({
+    cores,
+    history: 10,
+    seed: state.seed,
+  });
+}
+
+function handleSeedChange(seed) {
+  state.seed = seed;
+  searchParams.set("s", seed);
+  const { protocol, host, pathname } = window.location;
+  const path = [
+    protocol,
+    "//",
+    host,
+    pathname,
+    "?",
+    searchParams.toString(),
+  ].join("");
+  window.history.replaceState({ path }, "", path);
+  generateEngine();
+}
+
+function handleGroupChange(aOrB) {
   state.side = aOrB;
   if (aOrB === "a") {
     $groupA.classList.remove("unselected");
@@ -128,23 +132,25 @@ function updateLevel(level) {
 
   const constraintsDisplay = [...constraints].slice(0, guesses);
   const termsDisplay = shuffle([...terms].slice(0, quantity));
-  const limitedTermsDisplay = [...terms].slice(0, guesses);
+  const terms2Display = [...terms].slice(0, guesses);
+
+  drawTerms(constraintsDisplay, termsDisplay, terms2Display);
+}
+
+function drawTerms(constraints, terms, terms2) {
+  const termConstraint = (term, constraint) =>
+    `<li><strong>${term}</strong><br><em>${constraint}</em></li>`;
 
   $main.innerHTML = `
     <div class="view-1">
       <ul>
-        ${termsDisplay
-          .map((term) => `<li><strong>${term}</strong></li>`)
-          .join("")}
+        ${terms.map((term) => `<li><strong>${term}</strong></li>`).join("")}
       </ul>
     </div>
     <div class="view-2">
       <ul>
-        ${limitedTermsDisplay
-          .map(
-            (term, i) =>
-              `<li><strong>${term}</strong><br><em>${constraintsDisplay[i]}</em></li>`
-          )
+        ${terms2
+          .map((term, i) => termConstraint(term, constraints[i]))
           .join("")}
       </ul>
     </div>`;
