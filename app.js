@@ -1,4 +1,4 @@
-import data from "https://unpkg.com/lexicon-data@1.0.1/index.mjs";
+import data from "https://unpkg.com/lexicon-data@1.0.8/index.mjs";
 import SeededRandomEngine from "https://unpkg.com/seeded-random-engine@1.0.4/index.mjs";
 
 const { constraints, topics } = data;
