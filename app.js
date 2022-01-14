@@ -1,7 +1,7 @@
 import data from "https://unpkg.com/lexicon-data@1.0.8/index.mjs";
 import SeededRandomEngine from "https://unpkg.com/seeded-random-engine@1.0.4/index.mjs";
 
-const { constraints, topics } = data;
+const { lexiconConstraints, lexiconTopics } = data;
 
 const $main = document.querySelector("main");
 const $lost = document.getElementById("lost");
@@ -158,7 +158,7 @@ function drawTerms(constraints, terms, terms2) {
 
 function extractConstraints() {
   const values = state.engine.values();
-  const possible = constraints.simple;
+  const possible = lexiconConstraints.simple;
   const straints = [];
   for (let i = 0; i < maxGuesses; i++) {
     straints.push(possible[Math.floor(values[maxItems + i] * possible.length)]);
@@ -170,7 +170,7 @@ function extractTerms() {
   const values = state.engine.values();
   const terms = [];
   const topicsTmp = [];
-  topics.forEach((group) => topicsTmp.push([...group]));
+  lexiconTopics.forEach((group) => topicsTmp.push([...group]));
   for (let i = 0; i < rangeItems; i += 2) {
     const group = topicsTmp[Math.floor(values[i] * topicsTmp.length)];
     const index = Math.floor(values[i + 1] * group.length);
